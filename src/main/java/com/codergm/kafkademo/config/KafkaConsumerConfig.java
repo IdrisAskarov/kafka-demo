@@ -1,6 +1,7 @@
 package com.codergm.kafkademo.config;
 
 import org.apache.kafka.clients.consumer.ConsumerConfig;
+import org.apache.kafka.common.serialization.StringSerializer;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -24,6 +25,8 @@ public class KafkaConsumerConfig {
         Map<String, Object> props = new HashMap<>();
         props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG,bootstrapAddress);
         props.put(ConsumerConfig.GROUP_ID_CONFIG, groupId);
+        props.put("key.deserializer","org.apache.kafka.common.serialization.StringDeserializer");
+        props.put("value.deserializer","org.apache.kafka.common.serialization.StringDeserializer");
         return new DefaultKafkaConsumerFactory<>(props);
     }
 
@@ -32,6 +35,7 @@ public class KafkaConsumerConfig {
         ConcurrentKafkaListenerContainerFactory<String, String> factory =
                 new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(consumerFactory(groupId));
+        factory.setRecordFilterStrategy(record -> record.value().equalsIgnoreCase("world"));
         return factory;
     }
 
@@ -43,6 +47,24 @@ public class KafkaConsumerConfig {
     @Bean
     public ConcurrentKafkaListenerContainerFactory<String, String> barKafkaListenerContainerFactory() {
         return kafkaListenerContainerFactory("bar");
+    }
+
+
+    public ConcurrentKafkaListenerContainerFactory<String, String>
+    filterKafkaListenerContainerFactory(String groupId) {
+
+        ConcurrentKafkaListenerContainerFactory<String, String> factory =
+                new ConcurrentKafkaListenerContainerFactory<>();
+        factory.setConsumerFactory(consumerFactory(groupId));
+        factory.setRecordFilterStrategy(
+                record -> record.value().contains("World"));
+        return factory;
+    }
+
+    @Bean
+    public ConcurrentKafkaListenerContainerFactory<String, String>
+    miscFilterKafkaListenerContainerFactory(){
+        return filterKafkaListenerContainerFactory("misc");
     }
 
 }
