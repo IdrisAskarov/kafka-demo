@@ -1,10 +1,8 @@
 package com.codergm.kafkademo.controller;
 
+import com.codergm.kafkademo.model.Greeting;
 import com.codergm.kafkademo.service.KafkaService;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/kafka")
@@ -19,5 +17,10 @@ public class KafkaController {
     @PostMapping("/topic1")
     public void sendMessage(@RequestParam("msg") String msg){
         kafkaService.sendMessage(msg);
+    }
+
+    @PostMapping("/topic2")
+    public void sendGreeting(@RequestBody Greeting greeting){
+        kafkaService.sendGreeting(greeting);
     }
 }
