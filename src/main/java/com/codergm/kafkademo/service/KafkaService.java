@@ -15,7 +15,9 @@ import java.util.concurrent.Future;
 @Service
 public class KafkaService {
 
-    private final KafkaTemplate<String, String> kafkaTemplate;
+    @Autowired
+    private  KafkaTemplate<String, String> kafkaTemplate;
+    @Qualifier("kafkaObjectTemplate")
     private final KafkaTemplate<String, Greeting> kafkaObjectTemplate;
 
     @Value(value = "${kafka.topics.topic1}")
@@ -24,9 +26,9 @@ public class KafkaService {
     @Value(value = "${kafka.topics.topic2}")
     private String topic2;
 
-    public KafkaService(KafkaTemplate<String, String> kafkaTemplate,
+    public KafkaService(
                         @Qualifier(value = "kafkaObjectTemplate") KafkaTemplate<String, Greeting> kafkaObjectTemplate) {
-        this.kafkaTemplate = kafkaTemplate;
+
         this.kafkaObjectTemplate = kafkaObjectTemplate;
     }
 
@@ -35,14 +37,14 @@ public class KafkaService {
         processMessage(topic2, message);
     }
 
-    public void sendGreeting(Greeting greeting){
-        processGreeting(topic1,greeting);
+    public void sendGreeting(Greeting greeting) {
+        processGreeting("topic3", greeting);
     }
 
     private void processMessage(String topic, String message) {
         ListenableFuture<SendResult<String, String>> future = kafkaTemplate.send(topic, message);
         future.addCallback(success ->
-                        System.out.println("Sent message=[" + message + "] to topic["+topic+"]" +
+                        System.out.println("Sent message=[" + message + "] to topic[" + topic + "]" +
                                 " with offset=[" + success.getRecordMetadata().offset() + "]")
                 , failure ->
                         System.out.println("Unable to send message=[" + message + "] due to " + failure.getMessage())
@@ -52,8 +54,8 @@ public class KafkaService {
     private void processGreeting(String topic, Greeting greeting) {
         ListenableFuture<SendResult<String, Greeting>> future = kafkaObjectTemplate.send(topic, greeting);
         future.addCallback(success ->
-                        System.out.println("Sent greeting message=[" + greeting.getName() + "] " +
-                                "and greeting message=["+greeting.getMsg()+"]to topic["+topic+"]" +
+                        System.out.println("Sent greeting name=[" + greeting.getName() + "] " +
+                                "and greeting message=[" + greeting.getMsg() + "]to topic[" + topic + "]" +
                                 " with offset=[" + success.getRecordMetadata().offset() + "]")
                 , failure ->
                         System.out.println("Unable to send message=[" + greeting + "] due to " + failure.getMessage())

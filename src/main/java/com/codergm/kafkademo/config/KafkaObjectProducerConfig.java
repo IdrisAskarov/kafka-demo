@@ -21,11 +21,12 @@ public class KafkaObjectProducerConfig implements KafkaProducerConfig{
     @Value("${spring.kafka.bootstrap-servers}")
     private String bootstrapAddress;
 
+    @Bean("greetingProducerFactory")
     public ProducerFactory<String, Greeting> producerFactory() {
         Map<String, Object> configProps = new HashMap<>();
         configProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG,bootstrapAddress);
-        configProps.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
         configProps.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
+        configProps.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
         return new DefaultKafkaProducerFactory<>(configProps);
     }
 

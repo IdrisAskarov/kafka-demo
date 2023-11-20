@@ -19,6 +19,7 @@ public class KafkaExceptionHandler {
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorMessage handleError(Exception e){
         System.out.println("stackTrace:");
+        e.printStackTrace();
         List<String> details = Arrays.asList(e.getStackTrace())
                 .stream()
                 .filter(st -> st.toString().contains("com.codergm.kafkademo"))
